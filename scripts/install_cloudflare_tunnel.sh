@@ -25,7 +25,8 @@ WAIT_FOR_AGENT_TIMEOUT="${WAIT_FOR_AGENT_TIMEOUT:-600}"
 WAIT_FOR_AGENT_INTERVAL="${WAIT_FOR_AGENT_INTERVAL:-10}"
 
 IMAGE_DEST="/var/lib/vz/template/iso/${CLOUD_IMAGE_NAME}"
-SNIPPET_PATH="/var/lib/vz/snippets/${SNIPPET_NAME}"
+SNIPPET_DIR="/var/lib/vz/snippets"
+SNIPPET_PATH="${SNIPPET_DIR}/${SNIPPET_NAME}"
 
 step() {
   echo -e "\n${LOG_PREFIX} ==> $1"
@@ -69,33 +70,37 @@ ensure_snippet_support() {
   step "Vérification du support des snippets Cloud-Init"
   ensure_storage_exists "${SNIPPET_STORAGE}"
 
-  local storage_cfg="/etc/pve/storage.cfg"
-  if [[ ! -f "${storage_cfg}" ]]; then
-    echo "${LOG_PREFIX} Fichier ${storage_cfg} introuvable." >&2
+  local storage_config
+  if ! storage_config=$(pvesm config "${SNIPPET_STORAGE}" 2>/dev/null); then
+    echo "${LOG_PREFIX} Impossible de récupérer la configuration du stockage ${SNIPPET_STORAGE}" >&2
     exit 1
   fi
 
-  if ! awk -v storage="${SNIPPET_STORAGE}" '
-      $0 ~ "^"storage":" {in_block=1; next}
-      in_block && $1=="content" {if ($0 ~ /snippets/) found=1}
-      in_block && /^$/ {in_block=0}
-      END {exit found?0:1}
-    ' "${storage_cfg}"; then
+  if ! grep -q 'content.*snippets' <<<"${storage_config}"; then
     info "Activation du contenu 'snippets' sur le stockage ${SNIPPET_STORAGE}"
     local existing
-    existing=$(awk -v storage="${SNIPPET_STORAGE}" '
-      $0 ~ "^"storage":" {in_block=1; next}
-      in_block && $1=="content" {print $2; exit}
-      in_block && /^$/ {exit}
-    ' "${storage_cfg}")
+    existing=$(awk -F': ' '/^[[:space:]]*content/ {print $2; exit}' <<<"${storage_config}")
     if [[ -n "${existing}" ]]; then
       pvesm set "${SNIPPET_STORAGE}" --content "${existing},snippets"
     else
       pvesm set "${SNIPPET_STORAGE}" --content snippets
     fi
+
+    if ! storage_config=$(pvesm config "${SNIPPET_STORAGE}" 2>/dev/null); then
+      echo "${LOG_PREFIX} Impossible de relire la configuration du stockage ${SNIPPET_STORAGE}" >&2
+      exit 1
+    fi
   fi
 
-  install -d -m 0755 /var/lib/vz/snippets
+  local storage_path
+  if storage_path=$(pvesm path "${SNIPPET_STORAGE}" 2>/dev/null); then
+    SNIPPET_DIR="${storage_path%/}/snippets"
+    SNIPPET_PATH="${SNIPPET_DIR}/${SNIPPET_NAME}"
+  else
+    info "Impossible de déterminer le chemin du stockage ${SNIPPET_STORAGE}, utilisation du chemin par défaut ${SNIPPET_DIR}"
+  fi
+
+  install -d -m 0755 "${SNIPPET_DIR}"
 }
 
 check_vmid_availability() {

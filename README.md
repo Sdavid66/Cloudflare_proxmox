@@ -37,7 +37,7 @@ Le script principal se trouve dans `scripts/install_cloudflare_tunnel.sh`.
 | `CLOUDFLARE_TUNNEL_TOKEN` | Jeton Cloudflare pour installer automatiquement le service | *(vide)* |
 | `CLOUD_IMAGE_URL` | URL de l'image Debian cloud à utiliser | Debian 12 (Bookworm) |
 | `CLOUD_IMAGE_NAME` | Nom du fichier image stocké localement | `debian-12-genericcloud-amd64.qcow2` |
-| `SNIPPET_STORAGE` | Stockage contenant les snippets Cloud-Init | `local` |
+| `SNIPPET_STORAGE` | Stockage contenant les snippets Cloud-Init (un stockage de type dossier est recommandé) | `local` |
 | `SNIPPET_NAME` | Nom du snippet Cloud-Init généré | `<VM_NAME>-cloudinit.yaml` |
 
 ### Exécution locale
