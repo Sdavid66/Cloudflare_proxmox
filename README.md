@@ -15,23 +15,9 @@ Le script principal se trouve dans `scripts/install_cloudflare_tunnel.sh`.
 sudo ./scripts/install_cloudflare_tunnel.sh
 ```
 
-Vous pouvez également exécuter le script à distance sans le télécharger au préalable :
-
-```bash
-sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/scripts/install_cloudflare_tunnel.sh)"
-```
-
-Pour installer directement le service `cloudflared` avec votre tunnel :
-
 ```bash
 export CLOUDFLARE_TUNNEL_TOKEN="<votre_jeton>"
 sudo ./scripts/install_cloudflare_tunnel.sh
-```
-
-Ou à distance en une seule commande :
-
-```bash
-sudo CLOUDFLARE_TUNNEL_TOKEN="<votre_jeton>" bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/scripts/install_cloudflare_tunnel.sh)"
 ```
 
 Le script affiche chaque étape de l'installation, installe les dépendances requises, ajoute le dépôt officiel Cloudflare, installe `cloudflared` puis affiche l'adresse IP locale de la machine pour identifier l'agent.

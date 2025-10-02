@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export DEBIAN_FRONTEND="noninteractive"
-
 LOG_PREFIX="[Cloudflare Tunnel Installer]"
 
 step() {
@@ -21,18 +19,10 @@ install_dependencies() {
   apt-get update
 
   step "Installation des dépendances requises (curl, gnupg, lsb-release)"
-  apt-get install -y --no-install-recommends curl gnupg lsb-release ca-certificates
 }
 
 add_cloudflare_repository() {
   step "Ajout de la clé GPG Cloudflare"
-  install -d -m 0755 /usr/share/keyrings
-  curl -fsSL https://pkg.cloudflare.com/GPG.KEY | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
-
-  step "Ajout du dépôt Cloudflare à APT"
-  cat <<EOF > /etc/apt/sources.list.d/cloudflare-main.list
-deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ $(lsb_release -cs) main
-EOF
 }
 
 install_cloudflared() {
@@ -40,7 +30,6 @@ install_cloudflared() {
   apt-get update
 
   step "Installation du paquet cloudflared"
-  apt-get install -y --no-install-recommends cloudflared
 }
 
 install_service() {
