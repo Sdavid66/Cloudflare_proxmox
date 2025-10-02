@@ -15,7 +15,6 @@ Le script principal se trouve dans `scripts/install_cloudflare_tunnel.sh`.
 sudo ./scripts/install_cloudflare_tunnel.sh
 ```
 
-Pour installer directement le service `cloudflared` avec votre tunnel :
 ```bash
 export CLOUDFLARE_TUNNEL_TOKEN="<votre_jeton>"
 sudo ./scripts/install_cloudflare_tunnel.sh

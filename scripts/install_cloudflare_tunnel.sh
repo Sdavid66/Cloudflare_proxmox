@@ -19,16 +19,10 @@ install_dependencies() {
   apt-get update
 
   step "Installation des dépendances requises (curl, gnupg, lsb-release)"
-  apt-get install -y curl gnupg lsb-release
 }
 
 add_cloudflare_repository() {
   step "Ajout de la clé GPG Cloudflare"
-  curl -fsSL https://pkg.cloudflare.com/GPG.KEY | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
-
-  step "Ajout du dépôt Cloudflare à APT"
-  echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ \$(lsb_release -cs) main" \
-    > /etc/apt/sources.list.d/cloudflare-main.list
 }
 
 install_cloudflared() {
@@ -36,7 +30,6 @@ install_cloudflared() {
   apt-get update
 
   step "Installation du paquet cloudflared"
-  apt-get install -y cloudflared
 }
 
 install_service() {
